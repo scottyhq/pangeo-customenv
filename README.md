@@ -12,11 +12,12 @@ https://github.com/jupyterhub/repo2docker-action#push-repo2docker-image-to-docke
    DOCKER_PASSWORD=xxxxx
    ```
 
-1. check which Docker image tag is being used on the hub currently and make sure it matches the tag in this repo [Dockerfile](Dockerfile)
+1. check which Docker image tag is being used on the hub currently and make sure it matches the tag in this repo [Dockerfile](Dockerfile). Add a RUN command to install extra packages
     * AWS: https://github.com/pangeo-data/pangeo-cloud-federation/blob/prod/deployments/icesat2/image/binder/Dockerfile
     * GCP: https://github.com/pangeo-data/pangeo-cloud-federation/blob/prod/deployments/gcp-uscentral1b/image/binder/Dockerfile
    ```
-   FROM pangeo/base-image:2020.10.27
+   FROM pangeo/pangeo-notebook:2020.10.27
+   RUN conda install -y -c conda-forge parcels
    ```
 
 1. check which pangeo-dask package is installed in your notebook environment `conda list | grep pangeo-dask`
