@@ -1,1 +1,1 @@
-pangeo/base-image:latest
+FROM pangeo/base-image:latest
