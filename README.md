@@ -50,3 +50,22 @@ https://github.com/jupyterhub/repo2docker-action#push-repo2docker-image-to-docke
    options.image = 'scottyhq/pangeo-customenv:6a50eda562eb'
    cluster = gateway.new_cluster(options)
    ```
+
+
+### Troubleshooting:
+You might see warnings like:
+```
+/srv/conda/envs/notebook/lib/python3.8/site-packages/distributed/client.py:1129: VersionMismatchWarning: Mismatched versions found
+
++---------+--------+-----------+---------+
+| Package | client | scheduler | workers |
++---------+--------+-----------+---------+
+| blosc   | 1.9.2  | None      | None    |
+| lz4     | 3.1.0  | None      | None    |
+| numpy   | 1.19.2 | 1.19.4    | 1.19.4  |
+| tornado | 6.0.4  | 6.1       | 6.1     |
++---------+--------+-----------+---------+
+  warnings.warn(version_module.VersionMismatchWarning(msg[0]["warning"]))
+```
+If you're using those packages consider pinning the version numbers for 'client' in the environment.yml file in this repository
+
