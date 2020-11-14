@@ -1,0 +1,1 @@
+pangeo/base-image:latest
