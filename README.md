@@ -6,21 +6,46 @@ this uses the Repo2Docker Github Action to push an image to DockerHub that you c
 https://github.com/jupyterhub/repo2docker-action#push-repo2docker-image-to-dockerhub
 
     
-    1. add your DockerHub username and password as [repository secrets](https://docs.github.com/en/free-pro-team@latest/actions/reference/encrypted-secrets#creating-encrypted-secrets-for-a-repository). For your DOCKER_PASSWORD you should create an access token rather than using your sign-in password: https://www.docker.com/blog/docker-hub-new-personal-access-tokens/
-    ```
-    DOCKER_USERNAME=xxxxx
-    DOCKER_PASSWORD=xxxxx
-    ```
+1. add your DockerHub username and password as [repository secrets](https://docs.github.com/en/free-pro-team@latest/actions/reference/encrypted-secrets#creating-encrypted-secrets-for-a-repository). For your DOCKER_PASSWORD you should create an access token rather than using your sign-in password: https://www.docker.com/blog/docker-hub-new-personal-access-tokens/
+   ```
+   DOCKER_USERNAME=xxxxx
+   DOCKER_PASSWORD=xxxxx
+   ```
 
-    1. check which pangeo-dask package is installed in your notebook environment
-    `conda list | grep pangeo-dask`
-    # pangeo-dask               2020.10.08                    0    conda-forge
+1. check which Docker image tag is being used on the hub currently and make sure it matches the tag in this repo [Dockerfile](Dockerfile)
+    * AWS: https://github.com/pangeo-data/pangeo-cloud-federation/blob/prod/deployments/icesat2/image/binder/Dockerfile
+    * GCP: https://github.com/pangeo-data/pangeo-cloud-federation/blob/prod/deployments/gcp-uscentral1b/image/binder/Dockerfile
+   ```
+   FROM pangeo/base-image:2020.10.27
+   ```
 
-    1. modify [environment.yml](environment.yml) to include the same version of pangeo-dask (2020.10.08 following example above) and other packages you need
+1. check which pangeo-dask package is installed in your notebook environment `conda list | grep pangeo-dask`
+   ```
+   pangeo-dask               2020.10.08                    0    conda-forge
+   ```
 
-    1. a new image will be built via GitHub Actions and pushed to your DockerHub account with the following name:
-    ```
-    DOCKER_USERNAME/pangeo-customenv:COMMIT_SHA
-    ```
+1. modify [environment.yml](environment.yml) to include the same version of pangeo-dask (2020.10.08 following example above) and other packages you need, it will look something like this:    
+   ```
+   name: notebook
+   channels:
+     - conda-forge
+   dependencies:
+     - python=3.8*
+     - pangeo-dask=2020.10.08
+     - parcels
+     - xarray
+   ```
 
-    1. specify your custom image name from the last step when configuring a [dask gateway cluster](https://gateway.dask.org/usage.html#configure-a-cluster)
+1. a new image will be built via GitHub Actions and pushed to your DockerHub account with the following name:
+   ```
+   DOCKER_USERNAME/pangeo-customenv:COMMIT_SHA
+   ```
+
+1. specify your custom image name from the last step when configuring a [dask gateway cluster](https://gateway.dask.org/usage.html#configure-a-cluster). For example, with this repository:
+   ```python
+   from dask_gateway import Gateway
+   gateway = Gateway()
+   options = gateway.cluster_options()
+   options.image = 'scottyhq/pangeo-customenv:6a50eda562eb'
+   cluster = gateway.new_cluster(options)
+   ```
